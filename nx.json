@@ -36,7 +36,14 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/blogapi-microservices-e2e/**/*"]
+      "exclude": [
+        "apps/blogapi-microservices-e2e/**/*",
+        "apps/auth-service-e2e/**/*",
+        "apps/post-service-e2e/**/*",
+        "apps/comment-service-e2e/**/*",
+        "apps/category-service-e2e/**/*",
+        "apps/notification-service-e2e/**/*"
+      ]
     }
   ]
 }
