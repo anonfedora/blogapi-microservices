@@ -36,19 +36,19 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // app.connectMicroservice<MicroserviceOptions>({
-  //   transport: Transport.KAFKA,
-  //   options: {
-  //     client: {
-  //       brokers: ['localhost:9092'],
-  //     },
-  //     consumer: {
-  //       groupId: `auth-consumer`,
-  //     },
-  //   },
-  // });
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        brokers: ['localhost:9092'],
+      },
+      consumer: {
+        groupId: `auth-consumer`,
+      },
+    },
+  });
 
-  // await app.startAllMicroservices();
+  await app.startAllMicroservices();
   // const globalPrefix = 'api';
   // app.setGlobalPrefix(globalPrefix);
   const port = process.env.PORT || 3001;

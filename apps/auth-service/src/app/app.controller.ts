@@ -15,6 +15,7 @@ import { RegisterResponseDto } from './dto/register-response.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { EventPattern, Payload } from '@nestjs/microservices';
 
 @ApiTags('Auth')
 @ApiBearerAuth('access_token')
@@ -47,11 +48,17 @@ export class AppController {
     };
   }
 
+  @EventPattern('login-success')
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginUserDto: LoginUserDto): Promise<LoginResponseDto> {
+  async login(
+    @Body() loginUserDto: LoginUserDto,
+    @Payload() message
+  ): Promise<LoginResponseDto> {
     try {
       const result = await this.appService.login(loginUserDto);
+
+      console.log('message.value', message);
       return {
         status: 'Success',
         message: 'Login successful',

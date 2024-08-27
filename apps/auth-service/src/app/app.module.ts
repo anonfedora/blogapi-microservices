@@ -8,7 +8,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/types/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { ClientsModule } from '@nestjs/microservices';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -31,7 +31,24 @@ import { ClientsModule } from '@nestjs/microservices';
         uri: configService.get<string>('MONGO_URI'),
       }),
     }),
-    // ClientsModule.registerAsync({})
+    ClientsModule.registerAsync([
+      {
+        name: 'AUTH-SERVICE',
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.KAFKA,
+          options: {
+            client: {
+              brokers: ['localhost:9092'],
+            },
+            consumer: {
+              groupId: 'auth-consumer',
+            },
+          },
+        }),
+      },
+    ]),
     UsersModule,
     PassportModule,
   ],

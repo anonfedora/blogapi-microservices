@@ -1,7 +1,9 @@
 import {
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
+  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
@@ -12,14 +14,21 @@ import * as bcrypt from 'bcryptjs';
 import { User } from '../users/schemas/user.schema';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ConfigService } from '@nestjs/config';
+import { ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
-export class AppService {
+export class AppService implements OnModuleInit {
   constructor(
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    @Inject('AUTH-SERVICE') private readonly kafkaClient: ClientKafka
   ) {}
+
+  async onModuleInit() {
+    this.kafkaClient.subscribeToResponseOf('login-success');
+    await this.kafkaClient.connect();
+  }
 
   async register(createUserDto: CreateUserDto): Promise<any> {
     const existingUser = await this.userService.findByEmail(
@@ -62,7 +71,6 @@ export class AppService {
       loginUserdto.email,
       loginUserdto.password
     );
-    console.log('66user', user);
     if (!user) {
       throw new UnauthorizedException('Invalid Credentials');
     }
@@ -73,6 +81,8 @@ export class AppService {
       }),
       expiresIn: this.configService.getOrThrow('AUTH_EXPIRES'),
     });
+
+    this.kafkaClient.emit('login-success', user);
 
     return {
       access_token,
