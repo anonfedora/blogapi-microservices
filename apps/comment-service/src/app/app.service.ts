@@ -1,8 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  OnModuleInit,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
-export class AppService {
-  getData(): { message: string } {
-    return { message: 'Hello API' };
+export class AppService implements OnModuleInit {
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject('AUTH-SERVICE') private readonly kafkaClient: ClientKafka
+  ) {}
+
+  async onModuleInit() {
+    this.kafkaClient.subscribeToResponseOf('login-success');
+    await this.kafkaClient.connect();
   }
 }

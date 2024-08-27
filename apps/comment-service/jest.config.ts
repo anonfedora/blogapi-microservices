@@ -1,11 +1,11 @@
 /* eslint-disable */
 export default {
-  displayName: 'comment-service',
+  displayName: 'auth-service',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/apps/comment-service',
+  coverageDirectory: '../../coverage/apps/auth-service',
 };
